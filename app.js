@@ -1,57 +1,130 @@
-// Feature 1: Guess once.
-// Using alert and prompt, write a program that asks the user to guess a number and then tells them if they were correct, or if they should have guessed higher or lower.
+let randomNum = function (n) {
+  return Math.trunc(Math.random() * n) + 1;
+};
 
-// Main Function
-
-// Inputs:
-
-// (Number) Guess
-
-// Example Output:
-
-// (String) “Higher”, if Guess is lower than the secret number
-
-// Or
-
-// (String) “Lower”, if Guess is higher than the secret number
-
-// Or
-
-// (String) “Correct!” , if Guess is equal to the secret number
-
-// let guessFunction = function () {};
-let secretNum = Math.trunc(Math.random() * 20) + 1;
-let user = prompt("What is your name?");
-let numOfCounter = 0;
-let numGuessArr = [];
-let guess = prompt("Guess a number, you guess right you win a prize! 😎");
-let number = Number(guess);
-// let guess = Number.isInteger(number);
-
-while (true) {
-  !number ? (number = number) : numGuessArr.push(number);
-  if (!Number.isInteger(number) || guess === "") {
-    alert("You're not that guy pal 🤢");
-    guess = prompt("Guess a number, you guess right you win a prize! 😎");
-    number = Number(guess);
-    numOfCounter +
-  } else if (number === secretNum) {
-    guess = prompt(`Congrats ${user}! Previous Guesses:${numGuessArr.join(
-      ","
-    )} The number was ${secretNum}, you win 😎🎁`);
-    number = Number(guess);
-    numOfCounter += 1;
-    break;
-  } else if (number > secretNum) {
-    guess =  prompt(`Close ${user}, but might wanna try lower next time 📉`)
-    number = Number(guess);
-    numOfCounter += 1;
-  } else if (number < secretNum) {
-    guess =  prompt(`Close ${user}, but might wanna try higher next time 📈`)
-    number = Number(guess);
-    numOfCounter += 1;
+let guessCheck = function (string) {
+  if (string === "") {
+    return NaN;
+  } else if (string === null) {
+    return null;
+  } else {
+    return Number(string);
   }
-}
+};
 
-console.log(numGuessArr);
-console.log(numOfCounter);
+let numCheck = function (message) {
+  let number = guessCheck(prompt(message));
+
+  while (!Number.isInteger(number) && number !== null) {
+    number = guessCheck(prompt(`That is not a whole number, guess again! 🔢`));
+  }
+  return number;
+};
+
+let playAgain = function (message) {
+  let yesOrNo = prompt(message);
+  if (yesOrNo.toLowerCase() === "yes") {
+    number = "";
+    play();
+  } else if (yesOrNo.toLowerCase() === "no" || yesOrNo === null) {
+    alert(`Thanks for playing`);
+    number = "";
+  }
+};
+
+const users = {};
+
+let play = function () {
+  let previousGuesses;
+  let secrectNum = randomNum(10);
+  console.log(secrectNum);
+
+  let user = prompt(`Hello what is your name?`);
+
+  let addUsers = function (user) {
+    if (users[user] > 0) {
+      previousGuesses = users[user];
+    } else {
+      users[user] = numTries;
+    }
+    return previousGuesses;
+  };
+
+  let addTry = function () {
+    numTries++;
+    numTriesArr.push(number);
+  };
+
+  let scoreCompare = function () {
+    if (typeof previousGuesses === "undefined") {
+      previousGuesses = 0;
+    }
+    let guessDiff = Math.abs(previousGuesses - numTries);
+    if (previousGuesses > numTries) {
+      alert(
+        `Congrats ${user}, you took ${numTries}: (${numTriesArr.join(
+          ","
+        )}) ${guessDiff} less ${guessDiff > 1 ? "tries" : "try"} than before! `
+      );
+    } else if (previousGuesses < numTries) {
+      alert(
+        `Congrats ${user}, you took ${numTries}: (${numTriesArr.join(
+          ","
+        )}) ${guessDiff} more ${guessDiff > 1 ? "tries" : "try"} than before!`
+      );
+    } else {
+      alert(
+        `Congrats ${user}, you took ${numTries}: (${numTriesArr.join(
+          ","
+        )}) with the same ${
+          guessDiff > 1 ? "tries" : "try"
+        } attempts as before! `
+      );
+    }
+
+    users[user] = numTries;
+  };
+
+  if (user === null) {
+    return;
+  }
+
+  number = numCheck(`Guess a number 1 - 10, ${user}`);
+
+  let numTries = 0;
+  let numTriesArr = [];
+
+  while (number !== secrectNum) {
+    if (number === undefined || number === null) {
+      return;
+    } else if (number < secrectNum) {
+      addTry();
+      number = numCheck(
+        `${user} that was close, but try a little higher next time! 👆`
+      );
+    } else if (number > secrectNum) {
+      addTry();
+      number = numCheck(
+        `${user} that was close, but try a little lower next time! 👇`
+      );
+    }
+  }
+
+  while (number === secrectNum) {
+    debugger;
+    addTry();
+    console.log(previousGuesses);
+    console.log(users);
+    addUsers(user);
+    console.log(users);
+    console.log(previousGuesses);
+    console.log(numTries);
+
+    scoreCompare();
+    playAgain("Would you like to play again Yes or No?", user);
+  }
+  console.log(numTries, numTriesArr);
+  console.log(users[user]);
+};
+
+console.log(play());
